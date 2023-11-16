@@ -1,0 +1,22 @@
+version: '3.9'
+
+networks:
+
+  rujkakyle:
+    driver: bridge
+
+services:
+
+  postgres:
+    image: 'postgres:alpine'
+    container_name: 'postgresql'
+    restart: unless-stopped
+    networks:
+      - 'rujkakyle'
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - './services/db-postgres/db-data:/var/lib/postgresql/data'
+    environment:
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'

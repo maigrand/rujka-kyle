@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RconServer {
+  id       Int    @id @default(autoincrement())
+  address  String @unique
+  name     String
+  password String
+}
+
+model MonitoringServer {
+  id        Int     @id @default(autoincrement())
+  address   String  @unique
+  name      String
+  password  String?
+  guildId   String
+  channelId String
+  messageId String
+  index     Int?
+
+  @@unique([guildId, channelId, messageId])
+}
+
+model IpScanIp {
+  id    Int          @id @default(autoincrement())
+  ip    String       @unique
+  names IpScanName[]
+}
+
+model IpScanName {
+  id   Int        @id @default(autoincrement())
+  name String     @unique
+  ips  IpScanIp[]
+}

@@ -1,0 +1,80 @@
+{
+  "root": true,
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "airbnb-base",
+    "airbnb-typescript/base"
+  ],
+  "plugins": ["@typescript-eslint"],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
+  "globals": {
+    "ID": true,
+    "HTMLElementTagNameMap": true,
+    "IntersectionObserverCallback": true,
+    "app": true,
+    "webkit": true,
+    "MountComponent": true,
+    "MountOptions": true
+  },
+  "rules": {
+    "import/prefer-default-export": "off",
+    "class-methods-use-this": "off",
+    "linebreak-style":0,
+    "quotes": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "mjs": "never",
+        "ts": "never"
+      }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "vite.config.ts",
+          "**/*.test.ts"
+        ]
+      }
+    ],
+    "no-underscore-dangle": "off",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": ["error"],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "no-useless-constructor": "off",
+    "@typescript-eslint/no-useless-constructor": ["error"],
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": ["error"],
+    "no-use-before-define": ["error", {
+      "functions": false,
+      "classes": false,
+      "variables": true,
+      "allowNamedExports": false
+    }]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".ts"
+        ]
+      },
+      "alias": {
+        "map": [
+          ["@", "./src"],
+          ["@@", "."]
+        ],
+        "extensions": [".ts", ".js", ".json"]
+      }
+    }
+  }
+}
