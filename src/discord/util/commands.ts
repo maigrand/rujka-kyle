@@ -5,13 +5,14 @@ type Option = {
   description: string,
   type: 'STRING' | 'INTEGER' | 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE',
   required: boolean,
+  monitoringServerNamesChoices?: boolean,
 };
 
 type Command = {
   name: string,
   description: string,
-  defaultPermission: bigint
-  options?: Option[]
+  defaultPermission: bigint,
+  options?: Option[],
 };
 
 type CommandKeys =
@@ -65,6 +66,13 @@ export const commands: { [key in CommandKeys]: Command } = {
         description: 'server local name',
         type: 'STRING',
         required: true,
+        monitoringServerNamesChoices: true,
+      },
+      {
+        name: 'newname',
+        description: 'server new local name',
+        type: 'STRING',
+        required: false,
       },
       {
         name: 'address',
@@ -92,16 +100,11 @@ export const commands: { [key in CommandKeys]: Command } = {
     defaultPermission: PermissionsBitField.Flags.Administrator,
     options: [
       {
-        name: 'destination',
-        description: 'select text channel',
-        type: 'CHANNEL',
-        required: true,
-      },
-      {
         name: 'name',
         description: 'server local name',
         type: 'STRING',
         required: true,
+        monitoringServerNamesChoices: true,
       },
     ],
   },

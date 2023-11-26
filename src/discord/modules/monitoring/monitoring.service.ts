@@ -5,6 +5,14 @@ import { getStatusSmart } from 'jka-core';
 import { MonitoringServer } from '@prisma/client';
 import { MonitoringTaskService } from '@/discord/modules/monitoring/monitoringTask.service';
 
+type TUpdateServer = {
+  name: string,
+  address: string,
+  password: string,
+  index: number,
+  messageId: string,
+};
+
 @Injectable()
 export class MonitoringService {
   constructor(
@@ -42,7 +50,18 @@ export class MonitoringService {
     }
   }
 
-  public async listServers(guildId: string) {
+  public async listServers(guildId: string, orderByIndex?: boolean) {
+    if (orderByIndex) {
+      return this.prismaService.monitoringServer.findMany({
+        where: {
+          guildId,
+        },
+        orderBy: {
+          index: 'asc',
+        },
+      });
+    }
+
     return this.prismaService.monitoringServer.findMany({
       where: {
         guildId,
@@ -50,13 +69,35 @@ export class MonitoringService {
     });
   }
 
-  public async deleteServer(guildId: string, channelId: string, name: string) {
+  public async updateServer(id: number, guildId: string, data: TUpdateServer) {
+    try {
+      await this.prismaService.monitoringServer.updateMany({
+        where: {
+          id,
+          guildId,
+        },
+        data,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  public async findById(id: number, guildId: string) {
+    return this.prismaService.monitoringServer.findUnique({
+      where: {
+        id,
+        guildId,
+      },
+    });
+  }
+
+  public async deleteServer(id: number, guildId: string) {
     try {
       await this.prismaService.monitoringServer.deleteMany({
         where: {
+          id,
           guildId,
-          channelId,
-          name,
         },
       });
     } catch (e) {
@@ -64,19 +105,26 @@ export class MonitoringService {
     }
   }
 
-  public async update(emoji: GuildEmoji | undefined) {
+  public async updateTask(emoji: GuildEmoji | undefined) {
     try {
       const monitoringServerList = await this.prismaService.monitoringServer.findMany();
 
       const jkaResponsePromises = monitoringServerList
         .map(async (monitoringServer: MonitoringServer) => {
-          const jkaResponse = await getStatusSmart(monitoringServer.address);
-          return { monitoringServer, jkaResponse };
+          try {
+            const jkaResponse = await getStatusSmart(monitoringServer.address);
+            return { monitoringServer, jkaResponse };
+          } catch (e) {
+            return null;
+          }
         });
 
       const results = await Promise.all(jkaResponsePromises);
 
       results.forEach((result) => {
+        if (!result) {
+          return;
+        }
         const { monitoringServer, jkaResponse } = result;
 
         this.monitoringTaskService.updateServerState(monitoringServer, jkaResponse, emoji);
@@ -85,7 +133,7 @@ export class MonitoringService {
       console.error(e);
     } finally {
       await this.monitoringTaskService.delay(30000);
-      this.update(emoji);
+      this.updateTask(emoji);
     }
   }
 }
